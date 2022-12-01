@@ -24,7 +24,7 @@ func saveToCache(path string, input []byte) error {
 	return nil
 }
 func getFromWeb(day int) []byte {
-	uri := fmt.Sprintf("https://adventofcode.com/2021/day/%d/input", day)
+	uri := fmt.Sprintf("https://adventofcode.com/2022/day/%d/input", day)
 
 	req, err := http.NewRequest(http.MethodGet, uri, nil)
 
@@ -82,7 +82,6 @@ func getInput(day int) string {
 	}
 	return strings.TrimSuffix(string(input), "\n")
 }
-func ReadInputFile(day int) []string {
-	input := getInput(day)
-	return strings.Split(input, "\n")
+func ReadInputFile(day int) string {
+	return getInput(day)
 }
