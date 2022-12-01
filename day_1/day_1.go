@@ -3,30 +3,22 @@ package main
 import (
 	"advent_of_code/parser"
 	"fmt"
-	"sort"
 	"strconv"
 	"strings"
 )
 
+var solutions = make(map[int]int)
+
 func main() {
-	cals := extractCalories()
-	fmt.Println("part 1", part1(cals))
-	fmt.Println("part 2", part2(cals))
+	optimizedSolution()
+	fmt.Println("part 1", solutions[1])
+	fmt.Println("part 2", solutions[2])
 }
 
-func part1(cals []int) int {
-	return cals[len(cals)-1]
-}
-
-func part2(cals []int) int {
-	i := len(cals) - 1
-	return cals[i] + cals[i-1] + cals[i-2]
-}
-
-func extractCalories() []int {
+func optimizedSolution() {
 	input := parser.ReadInputFile(1)
 	elves := strings.Split(input, "\n\n")
-	calories := []int{}
+	lo, mid, hi := 0, 0, 0
 
 	for _, elf := range elves {
 		cals := strings.Split(elf, "\n")
@@ -38,11 +30,24 @@ func extractCalories() []int {
 			}
 			totalCals += c
 		}
-		calories = append(calories, totalCals)
-	}
 
-	sort.Slice(calories, func(i, j int) bool {
-		return calories[i] < calories[j]
-	})
-	return calories
+		// for part 1
+		if totalCals > solutions[1] {
+			solutions[1] = totalCals
+		}
+
+		// for part 2
+		switch {
+		case totalCals > hi:
+			lo = mid
+			mid = hi
+			hi = totalCals
+		case totalCals > mid:
+			lo = mid
+			mid = totalCals
+		case totalCals > lo:
+			lo = totalCals
+		}
+	}
+	solutions[2] = lo + mid + hi
 }
