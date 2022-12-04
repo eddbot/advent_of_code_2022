@@ -8,11 +8,11 @@ import (
 
 func main() {
 	input := parser.ReadInputFile(3)
-	fmt.Println(part1(input))
-	fmt.Println(part2(input))
+	fmt.Println("Part 1: ", part1(input))
+	fmt.Println("Part 2: ", part2(input))
 }
 
-func part1(input string)int{
+func part1(input string) int {
 	rucksacks := strings.Split(input, "\n")
 	total := 0
 	for _, rucksack := range rucksacks {
@@ -26,11 +26,11 @@ func part1(input string)int{
 	return total
 }
 
-func part2(input string)int {
+func part2(input string) int {
 	rucksacks := strings.Split(input, "\n")
 	total := 0
 
-	for i := 0; i < len(rucksacks) - 2; i+=3 {
+	for i := 0; i < len(rucksacks)-2; i += 3 {
 		itemCache := map[rune]int{}
 		line := uniq(rucksacks[i]) + uniq(rucksacks[i+1]) + uniq(rucksacks[i+2])
 
@@ -70,12 +70,10 @@ func uniq(input string) string {
 	return uniqString
 }
 
-func letterParser(in string)int{
-		cd := []byte(in)[0]
-		if cd > 90 {
-			cd -= 96
-		} else {
-			cd -= 38
-		}
-		return int(cd)
+func letterParser(in string) int {
+	cd := []byte(in)[0]
+	if cd > 90 {
+		return int(cd - 96)
+	}
+	return int(cd - 38)
 }
