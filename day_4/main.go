@@ -14,33 +14,31 @@ func main() {
 	fmt.Println("Part 2: ", part2)
 }
 
-func solution(input string)(int,int){
-	total1, total2 := 0,0
-	noOverlaps := 0
+func solution(input string) (int, int) {
+	part1, part2, noOverlaps := 0, 0, 0
 	assignments := strings.Split(input, "\n")
 	for _, assignment := range assignments {
 		gnomes := strings.Split(assignment, ",")
-		gnomeA, gnomeB := gnomes[0], gnomes[1]
-		gnomeAMin, gnomeAMax := minMax(gnomeA)
-		gnomeBMin, gnomeBMax := minMax(gnomeB)
+		gnomeAMin, gnomeAMax := minMax(gnomes[0])
+		gnomeBMin, gnomeBMax := minMax(gnomes[1])
 
-		total2++
-		if cmp1(gnomeAMin, gnomeBMin, gnomeAMax, gnomeBMax) {
-			total1++
+		if fullOverlap(gnomeAMin, gnomeBMin, gnomeAMax, gnomeBMax) {
+			part1++
 		}
-		if cmp2(gnomeAMin, gnomeBMin, gnomeAMax, gnomeBMax) {
+		if noOverlap(gnomeAMin, gnomeBMin, gnomeAMax, gnomeBMax) {
 			noOverlaps++
 		}
+		part2++
 	}
-	return total1, total2 - noOverlaps
+	return part1, (part2 - noOverlaps)
 }
 
-func cmp1(minA, minB, maxA, maxB int)bool {
+func fullOverlap(minA, minB, maxA, maxB int) bool {
 	return minA <= minB && maxA >= maxB ||
-	minB <= minA && maxB >= maxA
+		minB <= minA && maxB >= maxA
 }
 
-func cmp2(minA, minB, maxA, maxB int)bool {
+func noOverlap(minA, minB, maxA, maxB int) bool {
 	return maxA < minB || maxB < minA
 }
 
