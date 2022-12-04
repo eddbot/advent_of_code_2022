@@ -71,9 +71,9 @@ func uniq(input string) string {
 }
 
 func letterParser(in string) int {
-	cd := []byte(in)[0]
-	if cd > 90 {
-		return int(cd - 96)
+	c := []byte(in)[0]
+	if c > 90 {
+		return int(c - 96)
 	}
-	return int(cd - 38)
+	return int(c - 38)
 }
