@@ -16,7 +16,7 @@ func main() {
 func part1(stacks stacks, instructions []instruction) string {
 	for _, cmd := range instructions {
 		move, to, from := cmd.populate()
-		for i := 0; i < cmd.move; i++ {
+		for i := 0; i < move; i++ {
 			stacks[to] = stacks.insert(to, from, i)
 		}
 		stacks[from] = stacks.remain(from, move)
