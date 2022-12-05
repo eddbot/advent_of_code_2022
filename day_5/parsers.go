@@ -1,16 +1,9 @@
 package main
 
 import (
+	"advent_of_code/utils"
 	"strings"
 )
-
-type instruction struct {
-	move int
-	from int
-	to   int
-}
-
-type stacks map[int][]string
 
 func puzzleParser(input string) (stacks, []instruction) {
 	in := strings.Split(input, "\n\n")
@@ -42,10 +35,18 @@ func extractInstructions(input string) []instruction {
 	for _, row := range rows {
 		r := strings.Split(row, " ")
 		instructions = append(instructions, instruction{
-			move: conv(r[1]),
-			from: conv(r[3]),
-			to:   conv(r[5]),
+			move: utils.Conv(r[1]),
+			from: utils.Conv(r[3]),
+			to:   utils.Conv(r[5]),
 		})
 	}
 	return instructions
+}
+
+func answerParser(stacks map[int][]string) string {
+	answer := ""
+	for i := 0; i < len(stacks); i++ {
+		answer += stacks[i+1][0]
+	}
+	return answer
 }
