@@ -15,7 +15,6 @@ func (s stacks) dup() stacks {
 func (s stacks) remain(from, move int) []string {
 	return s[from][move:]
 }
-
 func (s stacks) insert(to, from, index int) []string {
 	return utils.Insert(s[to], s[from][index])
 }
