@@ -7,29 +7,28 @@ import (
 
 func main() {
 	input := parser.ReadInputFile(5)
-
 	stacks, instructions := puzzleParser(input)
-	fmt.Println(part1(stacks, instructions))
 
-	stacks, instructions = puzzleParser(input)
-	fmt.Println(part2(stacks, instructions))
-
+	fmt.Println(part1(stacks.dup(), instructions))
+	fmt.Println(part2(stacks.dup(), instructions))
 }
 
-func part1(stacks map[int][]string, instructions []instruction) string {
+func part1(stacks stacks, instructions []instruction) string {
 	for _, cmd := range instructions {
-		for i := 0; i < cmd.move; i++ {
-			stacks[cmd.to] = insert(stacks[cmd.to], stacks[cmd.from][i])
+		move, to, from := cmd.populate()
+		for i := 0; i < move; i++ {
+			stacks[to] = stacks.insert(to, from, i)
 		}
-		stacks[cmd.from] = stacks[cmd.from][cmd.move:]
+		stacks[from] = stacks.remain(from, move)
 	}
 	return answerParser(stacks)
 }
 
-func part2(stacks map[int][]string, instructions []instruction) string {
+func part2(stacks stacks, instructions []instruction) string {
 	for _, cmd := range instructions {
-		stacks[cmd.to] = insertMulti(stacks[cmd.to], stacks[cmd.from][0:cmd.move])
-		stacks[cmd.from] = stacks[cmd.from][cmd.move:]
+		move, to, from := cmd.populate()
+		stacks[to] = stacks.insertMultiple(to, from, move)
+		stacks[from] = stacks.remain(from, move)
 	}
 	return answerParser(stacks)
 }
