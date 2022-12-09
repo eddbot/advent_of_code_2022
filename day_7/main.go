@@ -9,11 +9,11 @@ import (
 )
 
 func main() {
-	// input := testInput()
 	input := parser.ReadInputFile(7)
-
-	p1 := part1(input)
-	fmt.Println(p1)
+	fs := createFS(input)
+	p1 := part1(fs)
+	p2 := part2(fs)
+	fmt.Printf("Part 1: %d, Part 2: %d\n", p1, p2)
 }
 
 type elFS struct {
@@ -24,6 +24,13 @@ type elFS struct {
 }
 
 var totals = []int{}
+
+func rewind(e *elFS) *elFS {
+	if e.prev == nil {
+		return e
+	}
+	return rewind(e.prev)
+}
 
 func walk(e *elFS) int {
 	// we have reached the end of our walk
@@ -38,17 +45,14 @@ func walk(e *elFS) int {
 	return e.size
 }
 
-func part1(input string) int {
-
+func createFS(input string) *elFS {
 	commands := strings.Split(input, "\n")
-
 	dir := &elFS{name: "/", prev: nil, next: map[string]*elFS{}}
 
 	for _, command := range commands[1:] {
 		cmd := strings.Split(command, " ")
 		// cd into a dir
 		if cmd[0] == "$" && cmd[1] == "cd" && cmd[2] != ".." {
-
 			// cd into existing dir
 			if d, ok := dir.next[cmd[2]]; ok {
 				dir = d
@@ -57,7 +61,6 @@ func part1(input string) int {
 				dir.next[cmd[2]] = &elFS{name: cmd[2], prev: dir, next: map[string]*elFS{}}
 				dir = dir.next[cmd[2]]
 			}
-
 		}
 		// cd out of a dir
 		if cmd[0] == "$" && cmd[1] == "cd" && cmd[2] == ".." {
@@ -69,77 +72,31 @@ func part1(input string) int {
 			dir.size += size
 		}
 	}
+	return dir
+}
 
+func part1(dir *elFS) int {
 	x := rewind(dir)
 	walk(x)
+	answer := 0
+	for _, t := range totals {
+		if t < 100000 {
+			answer += t
+		}
+	}
+	return answer
+}
 
-	// answer := 0
-
-	// part 1
-	// for _, t := range totals {
-	// 	if t < 100000 {
-	// 		answer += t
-	// 	}
-	// }
-	// fmt.Println(answer)
-
-	totalSpace := 70000000
-
-	unusedSpace := (totalSpace - x.size)
-	requiredSpace := 30000000 - unusedSpace
-
-	smallest := math.MaxInt
-
+func part2(dir *elFS) int {
+	x := rewind(dir)
+	requiredSpace := 30000000 - (70000000 - x.size)
+	answer := math.MaxInt
 	for _, t := range totals {
 		if t > requiredSpace {
-			if t < smallest {
-				smallest = t
+			if t < answer {
+				answer = t
 			}
 		}
 	}
-	return smallest
-
-}
-
-func puts[T comparable](in T) {
-	fmt.Println(in)
-}
-
-func rewind(e *elFS) *elFS {
-	if e.prev == nil {
-		return e
-	}
-	return rewind(e.prev)
-}
-func testInput() string {
-	return `$ cd /
-$ ls
-dir a
-14848514 b.txt
-8504156 c.dat
-dir d
-$ cd aaaa
-$ cd lol
-$ dir fucku
-$ cd ..
-$ ls
-dir e
-29116 f
-2557 g
-62596 h.lst
-$ cd eee
-$ cd empty
-$ ls
-dir zz
-$ cd ..
-$ ls
-584 i
-$ cd ..
-$ cd ..
-$ cd d
-$ ls
-4060174 j
-8033020 d.log
-5626152 d.ext
-7214296 k`
+	return answer
 }
