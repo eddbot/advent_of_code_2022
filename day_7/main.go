@@ -1,13 +1,15 @@
 package main
 
 import (
+	"advent_of_code/parser"
 	"advent_of_code/utils"
 	"fmt"
 	"strings"
 )
 
 func main() {
-	input := testInput()
+	// input := testInput()
+	input := parser.ReadInputFile(7)
 	p1 := part1(input)
 	fmt.Println(p1)
 }
@@ -19,13 +21,29 @@ type elFS struct {
 	size int
 }
 
+var total = 0
+var totals = map[string]int{}
+
+func walk(e *elFS) {
+
+	if len(e.next) == 0 {
+		return
+	}
+
+	for _, c := range e.next {
+		fmt.Printf("walking %s -> %s\n", e.name, c.name)
+
+		walk(c)
+	}
+}
+
 func part1(input string) int {
 
 	commands := strings.Split(input, "\n")
 
 	dir := &elFS{name: "/", prev: nil, next: map[string]*elFS{}}
 
-	for _, command := range commands {
+	for _, command := range commands[1:] {
 		cmd := strings.Split(command, " ")
 
 		// cd into a dir
@@ -41,23 +59,25 @@ func part1(input string) int {
 		// do the sizes
 		if cmd[0] != "$" && cmd[0] != "dir" {
 			size := utils.Conv(cmd[0])
-			dir.size += size
 
-			tmp := dir
-			for {
-				if tmp.prev == nil {
-					break
-				}
-				tmp.prev.size += size
-				tmp = tmp.prev
-			}
+			dir.size += size
 		}
 	}
 
-	fmt.Println(dir.prev.next["a"].next["e"])
+	x := rewind(dir)
+	walk(x)
 
+	fmt.Println(x)
+	fmt.Println(totals)
 	return 0
 
+}
+
+func rewind(e *elFS) *elFS {
+	if e.prev == nil {
+		return e
+	}
+	return rewind(e.prev)
 }
 func testInput() string {
 	return `$ cd /
