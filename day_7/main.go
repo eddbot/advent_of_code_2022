@@ -1,15 +1,14 @@
 package main
 
 import (
-	"advent_of_code/parser"
 	"advent_of_code/utils"
 	"fmt"
 	"strings"
 )
 
 func main() {
-	// input := testInput()
-	input := parser.ReadInputFile(7)
+	input := testInput()
+	// input := parser.ReadInputFile(7)
 	p1 := part1(input)
 	fmt.Println(p1)
 }
@@ -26,13 +25,13 @@ var totals = map[string]int{}
 
 func walk(e *elFS) {
 
+	fmt.Println(e.size)
 	if len(e.next) == 0 {
 		return
 	}
 
 	for _, c := range e.next {
-		fmt.Printf("walking %s -> %s\n", e.name, c.name)
-
+		fmt.Printf("walking %s -> %s \n", e.name, c.name)
 		walk(c)
 	}
 }
@@ -45,7 +44,6 @@ func part1(input string) int {
 
 	for _, command := range commands[1:] {
 		cmd := strings.Split(command, " ")
-
 		// cd into a dir
 		if cmd[0] == "$" && cmd[1] == "cd" && cmd[2] != ".." {
 			dir.next[cmd[2]] = &elFS{name: cmd[2], prev: dir, next: map[string]*elFS{}}
@@ -55,11 +53,9 @@ func part1(input string) int {
 		if cmd[0] == "$" && cmd[1] == "cd" && cmd[2] == ".." {
 			dir = dir.prev
 		}
-
 		// do the sizes
 		if cmd[0] != "$" && cmd[0] != "dir" {
 			size := utils.Conv(cmd[0])
-
 			dir.size += size
 		}
 	}
