@@ -4,6 +4,7 @@ import (
 	"advent_of_code/parser"
 	"advent_of_code/utils"
 	"fmt"
+	"math"
 	"strings"
 )
 
@@ -22,41 +23,19 @@ type elFS struct {
 	size int
 }
 
-var total = 0
-var totals = map[string]int{}
-var help = map[string]int{}
-var totes = [][]int{}
+var totals = []int{}
 
-func walk(e *elFS, path string) {
-
-	var p string
-	if e.name == "/" {
-		p = path + e.name
-	} else {
-		p = path + e.name + "/"
-
-	}
-	totals[p] = e.size
+func walk(e *elFS) int {
 	// we have reached the end of our walk
 	if len(e.next) == 0 {
-		// x =  [ asdjf lol ]
-		endPath := strings.Split(p, "/")
-
-		for {
-			// find the previous key
-			key := strings.Join(endPath[0:len(endPath)-1], "/") + "/"
-
-			if key == "/" {
-				break
-			}
-			endPath = endPath[0 : len(endPath)-1]
-		}
-
+		totals = append(totals, e.size)
+		return e.size
 	}
-
 	for _, c := range e.next {
-		walk(c, p)
+		e.size += walk(c)
 	}
+	totals = append(totals, e.size)
+	return e.size
 }
 
 func part1(input string) int {
@@ -92,30 +71,33 @@ func part1(input string) int {
 	}
 
 	x := rewind(dir)
-	walk(x, "")
-	fmt.Println(len(totals))
-	for k, v := range totals {
-		if v < 100000 {
-			fmt.Println(k, v)
+	walk(x)
 
-		}
-	}
-	answer := 0
+	// answer := 0
 
-	for i := 0; i < len(totes); i++ {
-		for j := 0; j < len(totes[i])-1; j++ {
-			totes[i][j+1] = totes[i][j] + totes[i][j+1]
-		}
-	}
-	for _, x := range totes {
-		fmt.Println(x)
-		for _, y := range x {
-			if y <= 100000 {
-				answer += y
+	// part 1
+	// for _, t := range totals {
+	// 	if t < 100000 {
+	// 		answer += t
+	// 	}
+	// }
+	// fmt.Println(answer)
+
+	totalSpace := 70000000
+
+	unusedSpace := (totalSpace - x.size)
+	requiredSpace := 30000000 - unusedSpace
+
+	smallest := math.MaxInt
+
+	for _, t := range totals {
+		if t > requiredSpace {
+			if t < smallest {
+				smallest = t
 			}
 		}
 	}
-	return 0
+	return smallest
 
 }
 
