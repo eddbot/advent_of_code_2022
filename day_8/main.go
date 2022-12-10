@@ -7,8 +7,6 @@ import (
 	"strings"
 )
 
-// 1816
-// 383520
 func main() {
 	input := parser.ReadInputFile(8)
 	forest := createForest(input)
@@ -36,7 +34,7 @@ func createForest(input string) [][]int {
 
 func part1(trees [][]int) int {
 	visibleTrees := 0
-	fuu := map[string]int{}
+	treeScanner := map[string]int{}
 
 	for i := 0; i < len(trees); i++ {
 		for j := 0; j < len(trees[i]); j++ {
@@ -45,85 +43,55 @@ func part1(trees [][]int) int {
 				visibleTrees++
 				continue
 			}
-			// check top
 			height := trees[i][j]
-			startPos := 0
-			currentPos := i
 
-			for {
-				// we made it to a tree!
-				if startPos == currentPos {
-					fu := fmt.Sprintf("[%d, %d]", startPos, j)
-					fuu[fu] = 1
+			// check top
+			for startPos := 0; startPos <= i; startPos++ {
+				if startPos == i {
+					t := fmt.Sprintf("[%d, %d]", startPos, j)
+					treeScanner[t] = 1
 					break
-
 				}
-				// tree_too_high.jpg
 				if trees[startPos][j] >= height {
 					break
 				}
-				// move to the next tree
-				startPos++
 			}
-
 			// check bottom
-			height = trees[i][j]
-			startPos = len(trees[i]) - 1
-			currentPos = i
-			for {
-				// we made it to a tree!
-				if startPos == currentPos {
-					fu := fmt.Sprintf("[%d, %d]", startPos, j)
-					fuu[fu] = 1
+			for startPos := len(trees[i]) - 1; startPos >= i; startPos-- {
+				if startPos == i {
+					t := fmt.Sprintf("[%d, %d]", startPos, j)
+					treeScanner[t] = 1
 					break
 				}
-				// tree_too_high.jpg
 				if trees[startPos][j] >= height {
 					break
 				}
-				// move to the next tree
-				startPos--
 			}
-
 			// check left
-			height = trees[i][j]
-			startPos = len(trees[i]) - 1
-			currentPos = j
-			for {
-				// we made it to a tree!
-				if startPos == currentPos {
-					fu := fmt.Sprintf("[%d, %d]", i, startPos)
-					fuu[fu] = 1
+			for startPos := len(trees[i]) - 1; startPos >= j; startPos-- {
+				if startPos == j {
+					t := fmt.Sprintf("[%d, %d]", i, startPos)
+					treeScanner[t] = 1
 					break
 				}
-				// tree_too_high.jpg
 				if trees[i][startPos] >= height {
 					break
 				}
-				// move to the next tree
-				startPos--
 			}
-			height = trees[i][j]
-			startPos = 0
-			currentPos = j
-			for {
-				// we made it to a tree!
-				if startPos == currentPos {
-					fu := fmt.Sprintf("[%d, %d]", i, startPos)
-					fuu[fu] = 1
+			// check right
+			for startPos := 0; startPos <= j; startPos++ {
+				if startPos == j {
+					t := fmt.Sprintf("[%d, %d]", i, startPos)
+					treeScanner[t] = 1
 					break
 				}
-				// tree_too_high.jpg
 				if trees[i][startPos] >= height {
 					break
 				}
-				// move to the next tree
-				startPos++
 			}
 		}
 	}
-
-	for _, v := range fuu {
+	for _, v := range treeScanner {
 		visibleTrees += v
 	}
 	return visibleTrees
@@ -142,31 +110,17 @@ func part2(trees [][]int) int {
 			scenicScore := 0
 
 			// look up
-			ups := i
-			for {
-				ups--
-				// we hit an edge
-				if ups < 0 {
-					break
-				}
+			for ups := (i - 1); ups >= 0; ups-- {
 				scenicScore++
-				// tree too high
 				if trees[ups][j] >= height {
 					break
 				}
-
 			}
 			scores = append(scores, scenicScore)
+
+			// look down
 			scenicScore = 0
-
-			downs := i
-			for {
-				downs++
-
-				// we hit an edge
-				if downs > len(trees[i])-1 {
-					break
-				}
+			for downs := (i + 1); downs < len(trees); downs++ {
 				scenicScore++
 				if trees[downs][j] >= height {
 					break
@@ -176,31 +130,17 @@ func part2(trees [][]int) int {
 
 			// look left
 			scenicScore = 0
-
-			lefts := j
-			for {
-				lefts--
-				// we hit an edge
-				if lefts < 0 {
-					break
-				}
+			for lefts := (j - 1); lefts >= 0; lefts-- {
 				scenicScore++
 				if trees[i][lefts] >= height {
 					break
 				}
-
 			}
 			scores = append(scores, scenicScore)
 
+			// look right
 			scenicScore = 0
-
-			rights := j
-			for {
-				rights++
-				// we hit an edge
-				if rights > len(trees)-1 {
-					break
-				}
+			for rights := (j + 1); rights < len(trees); rights++ {
 				scenicScore++
 				if trees[i][rights] >= height {
 					break
@@ -208,13 +148,12 @@ func part2(trees [][]int) int {
 			}
 			scores = append(scores, scenicScore)
 
+			// add all scores to the locations
 			locations = append(locations, scores)
 		}
-
 	}
 
 	answer := 0
-
 	for _, location := range locations {
 		acc := accumulate(location)
 		if acc > answer {
