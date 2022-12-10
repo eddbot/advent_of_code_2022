@@ -7,12 +7,15 @@ import (
 	"strings"
 )
 
+// 1816
+// 383520
 func main() {
-	//input := testInput()
 	input := parser.ReadInputFile(8)
 	forest := createForest(input)
 	p1 := part1(forest)
+	p2 := part2(forest)
 	fmt.Println(p1)
+	fmt.Println(p2)
 }
 
 func createForest(input string) [][]int {
@@ -46,6 +49,7 @@ func part1(trees [][]int) int {
 			height := trees[i][j]
 			startPos := 0
 			currentPos := i
+
 			for {
 				// we made it to a tree!
 				if startPos == currentPos {
@@ -125,12 +129,106 @@ func part1(trees [][]int) int {
 	return visibleTrees
 }
 
-func part2(trees [][]int) int {}
+func part2(trees [][]int) int {
 
-func testInput() string {
-	return `30373
-25512
-65332
-33549
-35390`
+	locations := [][]int{}
+
+	for i := 1; i < len(trees)-1; i++ {
+		for j := 1; j < len(trees[i])-1; j++ {
+			// lets not even consider the edges, they will be 0 so nein
+			height := trees[i][j]
+			scores := []int{}
+
+			scenicScore := 0
+
+			// look up
+			ups := i
+			for {
+				ups--
+				// we hit an edge
+				if ups < 0 {
+					break
+				}
+				scenicScore++
+				// tree too high
+				if trees[ups][j] >= height {
+					break
+				}
+
+			}
+			scores = append(scores, scenicScore)
+			scenicScore = 0
+
+			downs := i
+			for {
+				downs++
+
+				// we hit an edge
+				if downs > len(trees[i])-1 {
+					break
+				}
+				scenicScore++
+				if trees[downs][j] >= height {
+					break
+				}
+			}
+			scores = append(scores, scenicScore)
+
+			// look left
+			scenicScore = 0
+
+			lefts := j
+			for {
+				lefts--
+				// we hit an edge
+				if lefts < 0 {
+					break
+				}
+				scenicScore++
+				if trees[i][lefts] >= height {
+					break
+				}
+
+			}
+			scores = append(scores, scenicScore)
+
+			scenicScore = 0
+
+			rights := j
+			for {
+				rights++
+				// we hit an edge
+				if rights > len(trees)-1 {
+					break
+				}
+				scenicScore++
+				if trees[i][rights] >= height {
+					break
+				}
+			}
+			scores = append(scores, scenicScore)
+
+			locations = append(locations, scores)
+		}
+
+	}
+
+	answer := 0
+
+	for _, location := range locations {
+		acc := accumulate(location)
+		if acc > answer {
+			answer = acc
+		}
+	}
+	return answer
+}
+
+func accumulate(scores []int) int {
+	score := scores[0]
+
+	for _, tree := range scores[1:] {
+		score *= tree
+	}
+	return score
 }
