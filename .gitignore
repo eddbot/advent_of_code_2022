@@ -2,3 +2,4 @@ advent_of_code
 day_*/input
 day_*/day_*
 .DS_Store
+.idea
