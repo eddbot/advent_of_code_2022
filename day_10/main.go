@@ -1,6 +1,7 @@
 package main
 
 import (
+	"advent_of_code/parser"
 	"advent_of_code/utils"
 	"fmt"
 	"strings"
@@ -9,8 +10,8 @@ import (
 func main() {
 
 	//input := testInput()
-	input := bigtestInput()
-	// input := parser.ReadInputFile(10)
+	// input := bigtestInput()
+	input := parser.ReadInputFile(10)
 	p1 := part1(input)
 	fmt.Println(p1)
 }
@@ -18,7 +19,8 @@ func main() {
 func part1(input string) int {
 	register := 1
 	totalCycles := 0
-	sigger := 0
+	//sigger := 0
+	j := 0
 	sigStrengths := []int{}
 
 	screen := crtScreen()
@@ -39,22 +41,31 @@ func part1(input string) int {
 		}
 
 		for i := clockCycles; i > 0; i-- {
-			totalCycles++
-			if totalCycles == 20+sigger {
-				sigger += 40
-				sigStrengths = append(sigStrengths, register*totalCycles)
-			}
 
-			for _, g := range screen {
-				fmt.Println(g)
+			// part 1
+			//if totalCycles == 20+sigger {
+			//	sigger += 40
+			//	sigStrengths = append(sigStrengths, register*totalCycles)
+			//}
+
+			// part 2
+			if register == (totalCycles-(j*40)) || register-1 == (totalCycles-(j*40)) || register+1 == (totalCycles-(j*40)) {
+				screen[j][(totalCycles - (j * 40))] = "#"
 			}
-			fmt.Println("---")
+			totalCycles++
+			fmt.Println(j, totalCycles, register)
+			if totalCycles%40 == 0 {
+				j++
+			}
 		}
 		if exe {
 			register += utils.Conv(op[1])
 		}
 	}
 
+	for _, row := range screen {
+		fmt.Println(row)
+	}
 	return accumulate(sigStrengths)
 }
 
@@ -72,13 +83,12 @@ func crtScreen() [][]string {
 
 	for i := 0; i < 6; i++ {
 		c := []string{}
-		for j := 0; j < 40; j++ {
+		for i := 0; i < 40; i++ {
 			c = append(c, ".")
 		}
-
 		crt = append(crt, c)
 	}
-	fmt.Println(crt)
+
 	return crt
 }
 func testInput() string {
