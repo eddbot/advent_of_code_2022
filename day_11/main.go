@@ -67,7 +67,7 @@ func part1(input string) int {
 
 	}
 
-	for i := 0; i < 10000; i++ {
+	for i := 0; i < 20; i++ {
 		for m := 0; m < len(monkeySlice); m++ {
 			for _, item := range monkeySlice[m].items {
 				// inspect
