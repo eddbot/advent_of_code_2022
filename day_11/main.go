@@ -9,29 +9,28 @@ import (
 )
 
 type Monkey struct {
-	items     []int
-	operation func(int) int
-	test      func(int) bool
+	items     []int64
+	operation func(int64) int64
+	test      func(int64) bool
 	true      int
 	false     int
 	inspected int
 }
 
 func main() {
-	//input := testInput()
 	input := parser.ReadInputFile(11)
-	p1 := part1(input)
-	fmt.Println(p1)
+	s := solution(input)
+	fmt.Println(s)
 }
 
-func part1(input string) int {
+func solution(input string) int {
 
 	monkeySlice := []Monkey{}
 	monkeys := strings.Split(input, "\n\n")
-
+	var divisors = []int64{}
 	for _, m := range monkeys {
 
-		monkey := Monkey{items: []int{}, inspected: 0}
+		monkey := Monkey{items: []int64{}, inspected: 0}
 		stats := strings.Split(m, "\n")
 
 		// Monkey items
@@ -41,7 +40,7 @@ func part1(input string) int {
 			if item == "" {
 				continue
 			}
-			monkey.items = append(monkey.items, utils.Conv(item))
+			monkey.items = append(monkey.items, int64(utils.Conv(item)))
 		}
 		// operations
 		oo := strings.Split(stats[2], "old ")
@@ -50,8 +49,10 @@ func part1(input string) int {
 
 		// tests
 		tt := strings.Split(stats[3], " ")
-		divisor := utils.Conv(tt[len(tt)-1])
-		monkey.test = func(worry int) bool {
+		divisor := int64(utils.Conv(tt[len(tt)-1]))
+
+		divisors = append(divisors, divisor)
+		monkey.test = func(worry int64) bool {
 			return worry%divisor == 0
 		}
 
@@ -67,14 +68,28 @@ func part1(input string) int {
 
 	}
 
+	mod := divisors[0]
+
+	for _, d := range divisors[1:] {
+		mod *= d
+	}
+
+	// part 1 = 20
+	// part 2 = 100000
 	for i := 0; i < 20; i++ {
 		for m := 0; m < len(monkeySlice); m++ {
 			for _, item := range monkeySlice[m].items {
 				// inspect
 				monkeySlice[m].inspected++
-				x := monkeySlice[m].operation(item)
-				// get bored
-				x /= 3
+
+				// manage worry levels
+
+				// part 1
+				x := monkeySlice[m].operation(item) / 3
+
+				// part 2
+				//x := monkeySlice[m].operation(item) % mod
+
 				// test
 				t := monkeySlice[m].test(x)
 				// throw
@@ -85,7 +100,7 @@ func part1(input string) int {
 				}
 
 			}
-			monkeySlice[m].items = []int{}
+			monkeySlice[m].items = []int64{}
 			// we should have thrown all the items now
 		}
 	}
@@ -102,65 +117,35 @@ func mostActiveMonkeys(monkeys []Monkey) (int, int) {
 	return monkeys[0].inspected, monkeys[1].inspected
 }
 
-func operationFactory(operation, amount string) func(int) int {
+func operationFactory(operation, amount string) func(int64) int64 {
 
-	var a int
+	var a int64
 	if amount == "old" {
-		operation = "square me bebbe"
+		operation = "square me ;)"
 	} else {
-		a = utils.Conv(amount)
+		a = int64(utils.Conv(amount))
 	}
 
 	switch operation {
 	case "*":
-		return func(old int) int {
+		return func(old int64) int64 {
 			return old * a
 		}
 	case "/":
-		return func(old int) int {
+		return func(old int64) int64 {
 			return old / a
 		}
 	case "-":
-		return func(old int) int {
+		return func(old int64) int64 {
 			return old - a
 		}
 	case "+":
-		return func(old int) int {
+		return func(old int64) int64 {
 			return old + a
 		}
 	default:
-		return func(old int) int {
+		return func(old int64) int64 {
 			return old * old
 		}
 	}
-}
-
-func testInput() string {
-	return `Monkey 0:
-  Starting items: 79, 98
-  Operation: new = old * 19
-  Test: divisible by 23
-    If true: throw to monkey 2
-    If false: throw to monkey 3
-
-Monkey 1:
-  Starting items: 54, 65, 75, 74
-  Operation: new = old + 6
-  Test: divisible by 19
-    If true: throw to monkey 2
-    If false: throw to monkey 0
-
-Monkey 2:
-  Starting items: 79, 60, 97
-  Operation: new = old * old
-  Test: divisible by 13
-    If true: throw to monkey 1
-    If false: throw to monkey 3
-
-Monkey 3:
-  Starting items: 74
-  Operation: new = old + 3
-  Test: divisible by 17
-    If true: throw to monkey 0
-    If false: throw to monkey 1`
 }
